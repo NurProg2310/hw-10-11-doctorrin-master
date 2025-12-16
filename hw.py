@@ -7,9 +7,12 @@ def multiply(a, b):
     return a * b
 operation(multiply, 5, 3) -> 15
 """
+import time
+from turtledemo.penrose import start
+
 
 def operation(func, x: int, y: int) -> int:
-    pass
+    return func(x,y)
 
 """
 Exercise-2: Implement Map Function
@@ -20,7 +23,7 @@ my_map(lambda x: x**2, [1, 2, 3, 4]) -> [1, 4, 9, 16]
 """
 
 def my_map(func, my_list: list) -> list:
-    pass
+    return list(map(func,my_list))
 
 """
 Exercise-3: Lambda Function with Filter
@@ -31,7 +34,7 @@ filter_even_numbers([1, 2, 3, 4, 5, 6, 7, 8]) -> [1, 3, 5, 7]
 """
 
 def filter_even_numbers(numbers: list) -> list:
-    pass
+    return list(filter(lambda x:x%2!=0,numbers))
 
 """
 Exercise-4: Recursive Factorial
@@ -42,7 +45,11 @@ recursive_factorial(5) -> 120
 """
 
 def recursive_factorial(n: int) -> int:
-    pass
+    if n == 1:
+        return 1
+    else:
+        return n * recursive_factorial(n-1)
+
 
 """
 Exercise-5: Decorator for Timing
@@ -54,8 +61,19 @@ def sample_func():
     return [i**2 for i in range(10000)]
 """
 
+def sample_func():
+    return [i**2 for i in range(10000)]
+
 def timeit_decorator(func):
-    pass
+    def wr():
+        start_time = time.time()
+        r = func()
+        end_time = time.time()
+        print(f"Execution time: {end_time - start_time:.6f} seconds")
+        return r
+    return wr()
+timeit_decorator(sample_func)
+
 
 """
 Exercise-6: Function Composition
@@ -71,7 +89,11 @@ new_func(3) -> 36
 """
 
 def compose(*funcs):
-    pass
+    def composed(x):
+        for func in funcs:
+            x = func(x)
+        return x
+    return composed
 
 """
 Exercise-7: Partial Application
