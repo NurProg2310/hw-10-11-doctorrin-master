@@ -7,8 +7,11 @@ def multiply(a, b):
     return a * b
 operation(multiply, 5, 3) -> 15
 """
+import functools
 import time
 from turtledemo.penrose import start
+from functools import reduce
+
 
 
 def operation(func, x: int, y: int) -> int:
@@ -107,7 +110,9 @@ add_five_and_six(7) -> 18
 """
 
 def partial(func, *args):
-    pass
+    def wrapper(*new_args):
+        return func(*args, *new_args)
+    return wrapper
 
 """
 Exercise-8: Reduce to Compute Factorial
@@ -118,7 +123,13 @@ factorial_reduce(5) -> 120
 """
 
 def factorial_reduce(n: int) -> int:
-    pass
+    if n == 0:
+        return 1
+    else:
+        ls = list(range(1, n + 1))
+
+    return reduce(lambda el1, el2: el1 * el2, ls)
+
 
 """
 Exercise-9: Function Memoization
