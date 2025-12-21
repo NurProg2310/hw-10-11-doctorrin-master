@@ -10,8 +10,7 @@ operation(multiply, 5, 3) -> 15
 import functools
 import time
 from turtledemo.penrose import start
-from functools import reduce
-
+from functools import reduce, cache
 
 
 def operation(func, x: int, y: int) -> int:
@@ -74,7 +73,7 @@ def timeit_decorator(func):
         end_time = time.time()
         print(f"Execution time: {end_time - start_time:.6f} seconds")
         return r
-    return wr()
+    return wr
 timeit_decorator(sample_func)
 
 
@@ -144,7 +143,16 @@ memoized_function(5)  # -> This will return the cached result
 """
 
 def memoize(func):
-    pass
+    cache = {}
+    def wrapper(*args, **kwargs):
+        key = (args, tuple(sorted(kwargs.items())))
+        if key in cache:
+            return cache[key]
+        result = func(*args, **kwargs)
+        cache[key] = result
+        return result
+    return wrapper
+
 
 """
 Exercise-10: Custom Reduce Function
@@ -155,8 +163,19 @@ my_reduce(lambda x, y: x*y, [1, 2, 3, 4]) -> 24
 """
 
 def my_reduce(func, iterable, initializer=None):
-    pass
+    it = iter(iterable)
 
+    if initializer is None:
+        try:
+            accumulator = next(it)  # первый элемент
+        except StopIteration:
+            raise TypeError("my_reduce() on empty iterable with no initializer")
+    else:
+        accumulator = initializer
+    for element in it:
+        accumulator = func(accumulator, element)
+
+    return accumulator
 """
 Exercise-11: Lambda Function Sort
 Write a function "sort_by_last_letter(words: list) -> list" that sorts a list of words in ascending order based on the last letter of each word. Use a lambda function.
@@ -166,7 +185,7 @@ sort_by_last_letter(['apple', 'banana', 'cherry', 'date']) -> ['banana', 'apple'
 """
 
 def sort_by_last_letter(words: list) -> list:
-    pass
+    return sorted(words, key=lambda w: w[-1])
 
 """
 Exercise-12: Recursive List Reversal
@@ -177,7 +196,9 @@ recursive_reverse([1, 2, 3, 4, 5]) -> [5, 4, 3, 2, 1]
 """
 
 def recursive_reverse(my_list: list) -> list:
-    pass
+    if len(my_list) <= 1:
+        return my_list
+    return [my_list[-1]] + recursive_reverse(my_list[:-1])
 
 """
 Exercise-13: Decorator for Function Counting
@@ -194,7 +215,15 @@ test_function()
 """
 
 def count_calls(func):
-    pass
+    count = 0
+
+    def wrapper(*args, **kwargs):
+        nonlocal count  # даём доступ к переменной из внешней функции
+        count += 1
+        print(f"{func.__name__} was called {count} times.")
+        return func(*args, **kwargs)
+
+    return wrapper
 
 """
 Exercise-14: Use reduce to Find the Maximum Number
@@ -205,7 +234,7 @@ find_max([1, 2, 3, 4, 5]) -> 5
 """
 
 def find_max(numbers: list) -> int:
-    pass
+    return reduce(lambda x, y: x if x > y else y, numbers)
 
 """
 Exercise-15: Use filter and lambda to Remove Elements
@@ -216,7 +245,7 @@ remove_elements([1, 2, 3, 2, 4, 2, 5], 2) -> [1, 3, 4, 5]
 """
 
 def remove_elements(my_list: list, element):
-    pass
+    return list(filter(lambda x: x != element, my_list))
 
 """
 Exercise-16: Higher-Order Function for Repeats
@@ -228,8 +257,9 @@ repeat_three_times('hello') -> 'hellohellohello'
 """
 
 def repeat(n: int):
-    pass
-
+    def inner(s: str):
+        return s * n
+    return inner
 """
 Exercise-17: Recursive List Sum
 Write a function "recursive_sum(my_list: list) -> int" that recursively computes the sum of a list of integers.
@@ -239,7 +269,9 @@ recursive_sum([1, 2, 3, 4, 5]) -> 15
 """
 
 def recursive_sum(my_list: list) -> int:
-    pass
+    if not my_list:
+        return 0
+    return my_list[0] + recursive_sum(my_list[1:])
 
 """
 Exercise-18: Map with Multiple Lists
@@ -250,4 +282,4 @@ add_two_lists([1, 2, 3], [4, 5, 6]) -> [5, 7, 9]
 """
 
 def add_two_lists(list1: list, list2: list) -> list:
-    pass
+    return list(map(lambda x, y: x + y, list1, list2))
